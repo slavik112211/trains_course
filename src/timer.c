@@ -28,7 +28,6 @@ void processTime(V timerStruct *timer) {
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
         printTimer(timer);
-        timer->timePrinted = 1;
     }
 }
 
@@ -37,5 +36,6 @@ void printTimer(V timerStruct *timer) {
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;
     V int minutes        = (int)  timer->msFromEpoch / (1000*60);
 
-    bwprintf(COM2, "Time: %d:%d.%d\n\r", minutes, seconds, tenthOfSeconds);
+    bwprintf(COM2, "%d:%d.%d\n\r", minutes, seconds, tenthOfSeconds);
+    timer->timePrinted = 1;
 }
