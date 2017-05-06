@@ -8,7 +8,6 @@ typedef struct {
     int writeIndex;
 } ringBuffer;
 
-ringBuffer ringBuffer_construct(char *, int);
 int ringBuffer_hasElements(ringBuffer *);
 void ringBuffer_push(ringBuffer *, char);
 char ringBuffer_pop(ringBuffer *);

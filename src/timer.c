@@ -1,4 +1,4 @@
-#include <bwio.h>
+#include <io.h>
 #include <ts7200.h>
 #include <timer.h>
 
@@ -14,12 +14,13 @@ void startTimer() {
     *flags = buf;
 }
 
-int readTimer() {
-    V int *timerValue = (int *)(TIMER3_BASE + VAL_OFFSET);
+unsigned int readTimer() {
+    V unsigned int *timerValue = (unsigned int *)(TIMER3_BASE + VAL_OFFSET);
     return *timerValue;
 }
 
-void processTime(V timerStruct *timer) {
+void processTime(V globalsStruct* globals) {
+    V timerStruct *timer = globals->timer;
     timer->ticksCounter = readTimer();
     if ((timer->previousTicksCounter - timer->ticksCounter) >= TICKS_PER_MS) {
         timer->msFromEpoch++;
@@ -27,15 +28,16 @@ void processTime(V timerStruct *timer) {
         timer->timePrinted = 0;
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
-        printTimer(timer);
+        printTimer(globals);
     }
 }
 
-void printTimer(V timerStruct *timer) {
+void printTimer(V globalsStruct* globals) {
+    V timerStruct *timer = globals->timer;
     V int tenthOfSeconds = (int) (timer->msFromEpoch / 100) % 10;
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;
     V int minutes        = (int)  timer->msFromEpoch / (1000*60);
 
-    bwprintf(COM2, "%d:%d.%d\n\r", minutes, seconds, tenthOfSeconds);
+    bfprintf(globals, COM2, "%d:%d.%d\n\r", minutes, seconds, tenthOfSeconds);
     timer->timePrinted = 1;
 }

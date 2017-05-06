@@ -14,24 +14,36 @@ CFLAGS  = -c -fPIC -Wall -I. -I../include -mcpu=arm920t -msoft-float
 ASFLAGS	= -mcpu=arm920t -mapcs-32
 # -mapcs: always generate a complete stack frame
 
-LDFLAGS = -init main -Map main.map -N  -T orex.ld -L/u/wbcowan/gnuarm-4.0.2/lib/gcc/arm-elf/4.0.2 -L../lib
+LDFLAGS = -init main -Map main.map -N  -T orex.ld -L/u/wbcowan/gnuarm-4.0.2/lib/gcc/arm-elf/4.0.2
 
-all: timer.s main.s main.elf
+all: timer.s io.s ringBuffer.s main.s main.elf
 
-main.s: main.c main.h
+main.s: main.c
 	$(XCC) -S $(CFLAGS) main.c
 
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
-main.elf: main.o timer.o
-	$(LD) $(LDFLAGS) -o $@ main.o timer.o -lbwio -lgcc
+main.elf: main.o timer.o ringBuffer.o io.o
+	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o io.o -lgcc
 
-timer.s: timer.c timer.h
+timer.s: timer.c
 	$(XCC) -S $(CFLAGS) timer.c
 
 timer.o: timer.s
 	$(AS) $(ASFLAGS) -o timer.o timer.s
+
+io.s: io.c
+	$(XCC) -S $(CFLAGS) io.c
+
+io.o: io.s
+	$(AS) $(ASFLAGS) -o io.o io.s
+
+ringBuffer.s: ringBuffer.c
+	$(XCC) -S $(CFLAGS) ringBuffer.c
+
+ringBuffer.o: ringBuffer.s
+	$(AS) $(ASFLAGS) -o ringBuffer.o ringBuffer.s
 
 clean:
 	-rm -f main.elf *.s *.o main.map
