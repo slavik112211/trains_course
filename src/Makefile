@@ -24,8 +24,8 @@ main.s: main.c
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
-main.elf: main.o timer.o ringBuffer.o io.o
-	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o io.o -lgcc
+main.elf: main.o timer.o ringBuffer.o io.o ui.o
+	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o io.o ui.o -lgcc
 
 timer.s: timer.c
 	$(XCC) -S $(CFLAGS) timer.c
@@ -44,6 +44,12 @@ ringBuffer.s: ringBuffer.c
 
 ringBuffer.o: ringBuffer.s
 	$(AS) $(ASFLAGS) -o ringBuffer.o ringBuffer.s
+
+ui.s: ui.c
+	$(XCC) -S $(CFLAGS) ui.c
+
+ui.o: ui.s
+	$(AS) $(ASFLAGS) -o ui.o ui.s
 
 clean:
 	-rm -f main.elf *.s *.o main.map

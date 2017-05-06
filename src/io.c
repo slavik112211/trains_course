@@ -73,7 +73,7 @@ int putc( globalsStruct* globals, int channel, char c ) {
     return 0;
 }
 
-// int bwputc( globalsStruct* globals, int channel, char c ) {
+// int putc( globalsStruct* globals, int channel, char c ) {
 //     int *flags, *data;
 //     flags = getUARTFlags(channel);
 //     data = getUARTData(channel);
@@ -189,7 +189,7 @@ void i2a( int num, char *bf ) {
 
 void format( globalsStruct* globals, int channel, char *fmt, va_list va ) {
     char bf[12];
-    char ch, lz;
+    char ch, lz='0';
     int w;
 
     
@@ -197,11 +197,11 @@ void format( globalsStruct* globals, int channel, char *fmt, va_list va ) {
         if ( ch != '%' )
             putc( globals, channel, ch );
         else {
-            lz = 0; w = 0;
+            w = 1;
             ch = *(fmt++);
             switch ( ch ) {
             case '0':
-                lz = 1; ch = *(fmt++);
+                w++; ch = *(fmt++);
                 break;
             case '1':
             case '2':
@@ -221,7 +221,7 @@ void format( globalsStruct* globals, int channel, char *fmt, va_list va ) {
                 putc( globals, channel, va_arg( va, char ) );
                 break;
             case 's':
-                putw( globals, channel, w, 0, va_arg( va, char* ) );
+                putw( globals, channel, w, lz, va_arg( va, char* ) );
                 break;
             case 'u':
                 ui2a( va_arg( va, unsigned int ), 10, bf );

@@ -1,5 +1,6 @@
 #include <io.h>
 #include <ts7200.h>
+#include <ui.h>
 #include <timer.h>
 
 void startTimer() {
@@ -38,6 +39,8 @@ void printTimer(V globalsStruct* globals) {
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;
     V int minutes        = (int)  timer->msFromEpoch / (1000*60);
 
-    bfprintf(globals, COM2, "%d:%d.%d\n\r", minutes, seconds, tenthOfSeconds);
+
+    moveCursorToTimerPosition(globals);
+    bfprintf(globals, COM2, "Time: %0d:%0d.%d\n\r", minutes, seconds, tenthOfSeconds);
     timer->timePrinted = 1;
 }
