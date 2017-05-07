@@ -4,7 +4,15 @@
 #include <timer.h>
 #include <trackControl.h>
 
-void startTimer() {
+void initTimer(timerStruct *timer) {
+    timer->ticksCounter = 0;
+    timer->previousTicksCounter = 0xffffffff;
+    timer->msFromEpoch = 0;
+    timer->timePrinted = 0;
+}
+
+void startTimer(globalsStruct* globals) {
+    initTimer(globals->timer);
     V int *load = (int *) (TIMER3_BASE + LDR_OFFSET);
     *load = 0xffffffff;
 
@@ -40,9 +48,10 @@ void printTimer(globalsStruct* globals) {
     V timerStruct *timer = globals->timer;
     V int tenthOfSeconds = (int) (timer->msFromEpoch / 100) % 10;
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;
-    V int minutes        = (int)  timer->msFromEpoch / (1000*60);
+    V int minutes        = (int) (timer->msFromEpoch / (1000*60));
 
     moveCursorToTimerPosition(globals);
-    bfprintf(globals, COM2, "Time: %0d:%0d.%d\n\r", minutes, seconds, tenthOfSeconds);
+    // putr(globals, COM2, timer->msFromEpoch);
+    bfprintf(globals, COM2, "Time: %0d:%0d.%d", minutes, seconds, tenthOfSeconds);
     timer->timePrinted = 1;
 }

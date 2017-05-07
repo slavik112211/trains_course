@@ -16,7 +16,7 @@ ASFLAGS	= -mcpu=arm920t -mapcs-32
 
 LDFLAGS = -init main -Map main.map -N  -T orex.ld -L/u/wbcowan/gnuarm-4.0.2/lib/gcc/arm-elf/4.0.2
 
-all: timer.s stringFormat.s bufferIO.s ringBuffer.s trackControl.s main.s main.elf
+all: timer.s stringFormat.s bufferIO.s ringBuffer.s trackControl.s commandParser.s main.s main.elf
 
 main.s: main.c
 	$(XCC) -S $(CFLAGS) main.c
@@ -24,8 +24,8 @@ main.s: main.c
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
-main.elf: main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o
-	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o -lgcc
+main.elf: main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o
+	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o -lgcc
 
 timer.s: timer.c
 	$(XCC) -S $(CFLAGS) timer.c
@@ -62,6 +62,12 @@ trackControl.s: trackControl.c
 
 trackControl.o: trackControl.s
 	$(AS) $(ASFLAGS) -o trackControl.o trackControl.s
+
+commandParser.s: commandParser.c
+	$(XCC) -S $(CFLAGS) commandParser.c
+
+commandParser.o: commandParser.s
+	$(AS) $(ASFLAGS) -o commandParser.o commandParser.s
 
 clean:
 	-rm -f main.elf *.s *.o main.map

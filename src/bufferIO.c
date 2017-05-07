@@ -4,6 +4,7 @@
 #include <ts7200.h>
 #include <ui.h>
 #include <trackControl.h>
+#include <commandParser.h>
 
 void processOutputBuffer(globalsStruct* globals, int channel) {
     int *flags, *data;
@@ -15,7 +16,7 @@ void processOutputBuffer(globalsStruct* globals, int channel) {
 }
 
 int processInputBuffer(globalsStruct* globals, int channel) {
-    int *flags, *data, flagsBuffer;
+    int *flags, *data, flagsBuffer, resultStatus = 0;
     unsigned char c;
     flags = getUARTFlags(COM2);
     data = getUARTData(COM2);
@@ -27,22 +28,36 @@ int processInputBuffer(globalsStruct* globals, int channel) {
         flagsBuffer = flagsBuffer | RXFE_MASK;  // set 'Receive register empty' to ON
         *flags = flagsBuffer;
 
-        if(c == 3) return -1; // Ctrl-C
-        if(c != 13) { // Carriage return
-            ringBuffer_push(globals->inputBuffer, c);
-        } else {
-            clearCommandPrompt(globals);
-            printPreviousCommand(globals);
-            globals->inputBuffer->readIndex = globals->inputBuffer->writeIndex;
-            runTrain(globals, 70, 12);
-        }
+        resultStatus = processInputChar(globals, c);
     }
-    return 0;
+    return resultStatus;
+}
+
+int processInputChar(globalsStruct* globals, char c) {
+    int resultStatus = 0;
+    if(c == 3) return -1; // Ctrl-C
+    if(c != 13) { // Carriage return
+        ringBuffer_push(globals->inputBuffer, c);
+    } else {
+        clearCommandPrompt(globals);
+        copyActiveCommandFromInputBuffer(globals);
+        printPreviousCommand(globals);
+        resultStatus = parseCommand(globals);
+    }
+    return resultStatus;
 }
 
 int putc(globalsStruct* globals, int channel, char c) {
     ringBuffer_push(globals->outputBuffer, c);
     return 0;
+}
+
+void copyActiveCommandFromInputBuffer(globalsStruct* globals) {
+    V ringBuffer* inputBuffer = globals->inputBuffer;
+    V short int size = inputBuffer->writeIndex - inputBuffer->readIndex;
+    V int startIndex = inputBuffer->readIndex;
+    memcopy(globals->inputCommand, &inputBuffer->buffer[startIndex], size, 1);
+    inputBuffer->readIndex = inputBuffer->writeIndex;
 }
 
 // Busy-wait putc()

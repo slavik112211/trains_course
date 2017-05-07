@@ -7,33 +7,34 @@
 
 int main(int argc, char* argv[]) {
     globalsStruct globals;
-    timerStruct timer = {0, 0xffffffff, 0, 0};
+    timerStruct timer;
     V char outputBufferContainer[20000];
     ringBuffer outputBuffer = {(char*) &outputBufferContainer, 20000, 0, 0};
-
     V char inputBufferContainer[1024];
     ringBuffer inputBuffer = {(char*) &inputBufferContainer, 1024, 0, 0};
-
     V char trackSendContainer[1024];
     ringBuffer trackSendBuffer = {(char*) &trackSendContainer, 1024, 0, 0};
+    char inputCommand[100];
 
     globals.timer = &timer;
     globals.outputBuffer = &outputBuffer;
     globals.inputBuffer = &inputBuffer;
     globals.trackSendBuffer = &trackSendBuffer;
+    globals.inputCommand = &inputCommand[0];
 
     drawFrame(&globals);
+    startTimer(&globals);
     printPrompt(&globals);
-    startTimer();
     setFIFO(COM2, OFF);
     initTrack(&globals);
 
-    V int status;
+    V int resultStatus;
     FOREVER {
         processTime(&globals);
         processOutputBuffer(&globals, COM2);
-        status = processInputBuffer(&globals, COM2);
-        if(status == -1) break;
+        resultStatus = processInputBuffer(&globals, COM2);
+        if(resultStatus == -1) break;
     }
     return 0;
 }
+

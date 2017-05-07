@@ -30,15 +30,13 @@ void initUART(int channel) {
     buf = *line;
     buf = buf & ~FEN_MASK; // FIFO off
     buf = buf | WLEN_MASK; // 8 bit per frame
-    // Two stop bits are transmitted at the end of the frame
-    buf = buf | STP2_MASK;
-    // No parity bit is added to the data frame
-    buf = buf & ~PEN_MASK;
+    buf = buf | STP2_MASK; // Two stop bits are transmitted at the end of the frame
+    buf = buf & ~PEN_MASK; // No parity bit is added to the data frame
     *line = buf;
 }
 
 void runTrain(globalsStruct* globals, int train, int speed) {
-    if(speed < 0 || speed > 15) speed = 5;
+    if(speed < 0 || speed > 14) speed = 5;
     if(train < 0 || train > 100) train = 58;
     ringBuffer_push(globals->trackSendBuffer, speed);
     ringBuffer_push(globals->trackSendBuffer, train);

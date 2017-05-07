@@ -78,11 +78,18 @@ void printCurrentCommand(globalsStruct* globals, int row, int column) {
 }
 
 void printActiveCommand(globalsStruct* globals) {
-    printCurrentCommand(globals, FRAME_HEIGHT-2, 19);
+    moveCursorToPosition(globals, FRAME_HEIGHT-2, 19);
+    V ringBuffer* inputBuffer = globals->inputBuffer;
+    V int i = inputBuffer->readIndex;
+    while (i < inputBuffer->writeIndex) {
+        putc(globals, COM2, inputBuffer->buffer[i]);
+        i++;
+    }
 }
 
 void printPreviousCommand(globalsStruct* globals) {
-    printCurrentCommand(globals, FRAME_HEIGHT-3, 19);
+    moveCursorToPosition(globals, FRAME_HEIGHT-3, 19);
+    putstr(globals, COM1, globals->inputCommand);
 }
 
 void eraseCommand(globalsStruct* globals, int row) {

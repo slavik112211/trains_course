@@ -3,9 +3,11 @@
 
 #include <main.h>
 
-int processInputBuffer(globalsStruct* globals, int channel);
 void processOutputBuffer(globalsStruct* globals, int channel);
-int putc( globalsStruct* globals, int channel, char c );
+int processInputBuffer(globalsStruct* globals, int channel);
+int processInputChar(globalsStruct* globals, char c);
+int putc(globalsStruct* globals, int channel, char c);
+void copyActiveCommandFromInputBuffer(globalsStruct* globals);
 
 // COM ports control functions:
 int* getUARTHighControl(int channel);
