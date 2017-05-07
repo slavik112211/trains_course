@@ -1,4 +1,4 @@
-#include <io.h>
+#include <stringFormat.h>
 #include <ts7200.h>
 #include <ui.h>
 #include <timer.h>
@@ -21,7 +21,7 @@ unsigned int readTimer() {
     return *timerValue;
 }
 
-void processTime(V globalsStruct* globals) {
+void processTime(globalsStruct* globals) {
     V timerStruct *timer = globals->timer;
     timer->ticksCounter = readTimer();
     if ((timer->previousTicksCounter - timer->ticksCounter) >= TICKS_PER_MS) {
@@ -36,7 +36,7 @@ void processTime(V globalsStruct* globals) {
     }
 }
 
-void printTimer(V globalsStruct* globals) {
+void printTimer(globalsStruct* globals) {
     V timerStruct *timer = globals->timer;
     V int tenthOfSeconds = (int) (timer->msFromEpoch / 100) % 10;
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;

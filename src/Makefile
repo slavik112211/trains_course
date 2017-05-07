@@ -16,7 +16,7 @@ ASFLAGS	= -mcpu=arm920t -mapcs-32
 
 LDFLAGS = -init main -Map main.map -N  -T orex.ld -L/u/wbcowan/gnuarm-4.0.2/lib/gcc/arm-elf/4.0.2
 
-all: timer.s io.s ringBuffer.s trackControl.s main.s main.elf
+all: timer.s stringFormat.s bufferIO.s ringBuffer.s trackControl.s main.s main.elf
 
 main.s: main.c
 	$(XCC) -S $(CFLAGS) main.c
@@ -24,8 +24,8 @@ main.s: main.c
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
-main.elf: main.o timer.o ringBuffer.o io.o ui.o trackControl.o
-	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o io.o ui.o trackControl.o -lgcc
+main.elf: main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o
+	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o -lgcc
 
 timer.s: timer.c
 	$(XCC) -S $(CFLAGS) timer.c
@@ -33,11 +33,17 @@ timer.s: timer.c
 timer.o: timer.s
 	$(AS) $(ASFLAGS) -o timer.o timer.s
 
-io.s: io.c
-	$(XCC) -S $(CFLAGS) io.c
+bufferIO.s: bufferIO.c
+	$(XCC) -S $(CFLAGS) bufferIO.c
 
-io.o: io.s
-	$(AS) $(ASFLAGS) -o io.o io.s
+bufferIO.o: bufferIO.s
+	$(AS) $(ASFLAGS) -o bufferIO.o bufferIO.s
+
+stringFormat.s: stringFormat.c
+	$(XCC) -S $(CFLAGS) stringFormat.c
+
+stringFormat.o: stringFormat.s
+	$(AS) $(ASFLAGS) -o stringFormat.o stringFormat.s
 
 ringBuffer.s: ringBuffer.c
 	$(XCC) -S $(CFLAGS) ringBuffer.c

@@ -1,6 +1,5 @@
 #include <ringBuffer.h>
 #include <main.h>
-#include <io.h>
 
 ringBuffer ringBuffer_new(int size) {
     char bufferContainer[size];

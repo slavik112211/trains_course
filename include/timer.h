@@ -7,7 +7,7 @@
 
 void startTimer();
 unsigned int readTimer();
-void printTimer(V globalsStruct*);
-void processTime(V globalsStruct*);
+void printTimer(globalsStruct*);
+void processTime(globalsStruct*);
 
 #endif

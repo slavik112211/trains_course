@@ -1,8 +1,7 @@
-#ifndef _IO_INCL_GUARD
-#define _IO_INCL_GUARD
+#ifndef _STRING_INCL_GUARD
+#define _STRING_INCL_GUARD
 
 #include <main.h>
-#include <ringBuffer.h>
 
 typedef char *va_list;
 
@@ -16,14 +15,6 @@ typedef char *va_list;
 #define va_arg(ap, t)	\
 		 (((ap) = (ap) + __va_argsiz(t)), *((t*) (void*) ((ap) - __va_argsiz(t))))
 
-int setfifo( int channel, int state );
-
-int setSpeed( int channel, int speed );
-
-int putc( globalsStruct* globals, int channel, char c );
-
-int getc( globalsStruct* globals, int channel );
-
 int putx( globalsStruct* globals, int channel, char c );
 
 int putstr( globalsStruct* globals, int channel, char *str );
@@ -33,11 +24,5 @@ int putr( globalsStruct* globals, int channel, unsigned int reg );
 void putw( globalsStruct* globals, int channel, int n, char fc, char *bf );
 
 void bfprintf( globalsStruct* globals, int channel, char *fmt, ... );
-
-int* getUARTHighControl(int channel);
-int* getUARTFlags(int channel);
-int* getUARTData(int channel);
-int processInputBuffer(globalsStruct* globals, int channel);
-void processOutputBuffer(globalsStruct* globals, int channel);
 
 #endif

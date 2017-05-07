@@ -1,5 +1,6 @@
 #include <main.h>
-#include <io.h>
+#include <bufferIO.h>
+#include <stringFormat.h>
 #include <ui.h>
 
 // http://ascii-table.com/ansi-escape-sequences.php

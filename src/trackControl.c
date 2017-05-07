@@ -1,5 +1,5 @@
 #include <main.h>
-#include <io.h>
+#include <bufferIO.h>
 #include <ui.h>
 #include <ringBuffer.h>
 #include <trackControl.h>
@@ -11,7 +11,7 @@
  */
 
 void initTrack(globalsStruct* globals) {
-    setSpeed(COM1, 2400);
+    setCOMBaudRate(COM1, 2400);
     initUART(COM1);
     startTrack(globals);
 }
@@ -37,9 +37,9 @@ void initUART(int channel) {
     *line = buf;
 }
 
-int runTrain(globalsStruct* globals, int train, int speed) {
+void runTrain(globalsStruct* globals, int train, int speed) {
     if(speed < 0 || speed > 15) speed = 5;
-    if(train < 0 || train > 100) train = 58; 
+    if(train < 0 || train > 100) train = 58;
     ringBuffer_push(globals->trackSendBuffer, speed);
     ringBuffer_push(globals->trackSendBuffer, train);
 }

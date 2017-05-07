@@ -7,7 +7,7 @@ void initTrack(globalsStruct* globals);
 void startTrack(globalsStruct* globals);
 void stopTrack(globalsStruct* globals);
 void initUART(int channel);
-int runTrain(globalsStruct* globals, int train, int speed);
+void runTrain(globalsStruct* globals, int train, int speed);
 void stopTrain(globalsStruct* globals, int train);
 void processTrackSendBuffer(globalsStruct* globals);
 
