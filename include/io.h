@@ -34,6 +34,7 @@ void bfprintf( globalsStruct* globals, int channel, char *fmt, ... );
 
 int* getUARTFlags(int channel);
 int* getUARTData(int channel);
+int processInputBuffer(globalsStruct* globals, int channel);
 void processOutputBuffer(globalsStruct* globals, int channel);
 
 #endif

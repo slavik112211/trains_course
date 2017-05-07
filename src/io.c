@@ -91,6 +91,31 @@ void processOutputBuffer( globalsStruct* globals, int channel ) {
     }
 }
 
+int processInputBuffer( globalsStruct* globals, int channel ) {
+    int *flags, *data, flagsBuffer;
+    unsigned char c;
+    flags = getUARTFlags(COM2);
+    data = getUARTData(COM2);
+
+    if(*flags & RXFF_MASK) {
+        c = *data;
+        flagsBuffer = *flags;
+        flagsBuffer = flagsBuffer & ~RXFF_MASK; // set 'Receive register full' to OFF
+        flagsBuffer = flagsBuffer | RXFE_MASK;  // set 'Receive register empty' to ON
+        *flags = flagsBuffer;
+
+        if(c == 3) return -1; // Ctrl-C
+        if(c != 13) { // Carriage return
+            ringBuffer_push(globals->inputBuffer, c);
+        } else {
+            clearCommandPrompt(globals);
+            printPreviousCommand(globals);
+            globals->inputBuffer->readIndex = globals->inputBuffer->writeIndex;
+        }
+    }
+    return 0;
+}
+
 char c2x( char ch ) {
     if ( (ch <= 9) ) return '0' + ch;
     return 'a' + ch - 10;

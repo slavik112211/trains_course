@@ -24,6 +24,7 @@ typedef struct {
 typedef struct {
     V timerStruct* timer;
     V ringBuffer* outputBuffer;
+    V ringBuffer* inputBuffer;
 } globalsStruct;
 
 #endif

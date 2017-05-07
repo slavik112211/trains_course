@@ -30,6 +30,7 @@ void processTime(V globalsStruct* globals) {
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
         printTimer(globals);
+        printActiveCommand(globals);
     }
 }
 
@@ -38,7 +39,6 @@ void printTimer(V globalsStruct* globals) {
     V int tenthOfSeconds = (int) (timer->msFromEpoch / 100) % 10;
     V int seconds        = (int) (timer->msFromEpoch / 1000) % 60;
     V int minutes        = (int)  timer->msFromEpoch / (1000*60);
-
 
     moveCursorToTimerPosition(globals);
     bfprintf(globals, COM2, "Time: %0d:%0d.%d\n\r", minutes, seconds, tenthOfSeconds);

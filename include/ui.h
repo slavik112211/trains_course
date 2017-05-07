@@ -15,5 +15,11 @@ void moveCursorDown(globalsStruct* globals, int rows);
 void moveCursorRight(globalsStruct* globals, int columns);
 void moveCursorLeft(globalsStruct* globals, int columns);
 void moveCursorToTimerPosition(globalsStruct* globals);
+void printPrompt(globalsStruct* globals);
+void printCurrentCommand(globalsStruct* globals, int row, int column);
+void printActiveCommand(globalsStruct* globals);
+void printPreviousCommand(globalsStruct* globals);
+void eraseCurrentCommand(globalsStruct* globals);
+void clearCommandPrompt(globalsStruct* globals);
 
 #endif

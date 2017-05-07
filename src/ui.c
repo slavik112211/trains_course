@@ -2,6 +2,8 @@
 #include <io.h>
 #include <ui.h>
 
+// http://ascii-table.com/ansi-escape-sequences.php
+
 void drawFrame(globalsStruct* globals) {
     printNewlines(globals, FRAME_HEIGHT*2);
     V int i=1, j=1;
@@ -57,4 +59,40 @@ void moveCursorLeft(globalsStruct* globals, int columns) {
 
 void moveCursorToTimerPosition(globalsStruct* globals) {
     moveCursorToPosition(globals, 3, FRAME_WIDTH-15);
+}
+
+void printPrompt(globalsStruct* globals) {
+    moveCursorToPosition(globals, FRAME_HEIGHT-2, 3);
+    bfprintf(globals, COM2, "Enter command > ");
+}
+
+void printCurrentCommand(globalsStruct* globals, int row, int column) {
+    moveCursorToPosition(globals, row, column);
+    V ringBuffer* inputBuffer = globals->inputBuffer;
+    V int i = inputBuffer->readIndex;
+    while (i < inputBuffer->writeIndex) {
+        putc(globals, COM2, inputBuffer->buffer[i]);
+        i++;
+    }
+}
+
+void printActiveCommand(globalsStruct* globals) {
+    printCurrentCommand(globals, FRAME_HEIGHT-2, 19);
+}
+
+void printPreviousCommand(globalsStruct* globals) {
+    printCurrentCommand(globals, FRAME_HEIGHT-3, 19);
+}
+
+void eraseCommand(globalsStruct* globals, int row) {
+    moveCursorToPosition(globals, row, 19);
+    V int i;
+    for(i=0;i<FRAME_WIDTH-20;i++) {
+        putc(globals, COM2, ' ');
+    }
+}
+
+void clearCommandPrompt(globalsStruct* globals) {
+    eraseCommand(globals, FRAME_HEIGHT-2);
+    eraseCommand(globals, FRAME_HEIGHT-3);
 }
