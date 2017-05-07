@@ -96,3 +96,8 @@ void clearCommandPrompt(globalsStruct* globals) {
     eraseCommand(globals, FRAME_HEIGHT-2);
     eraseCommand(globals, FRAME_HEIGHT-3);
 }
+
+void printDebug(globalsStruct* globals, int row, int column, char c) {
+    moveCursorToPosition(globals, row, column);
+    putr(globals, COM2, c);
+}

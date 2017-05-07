@@ -8,6 +8,7 @@
 #include <ts7200.h>
 #include <io.h>
 #include <ringBuffer.h>
+#include <trackControl.h>
 #include <main.h>
 
 /*
@@ -17,23 +18,58 @@
  *  no parity
  *  fifos enabled
  */
-int setfifo( int channel, int state ) {
-    int *line, buf;
+int* getUARTHighControl(int channel) {
+    int *flags;
     switch( channel ) {
     case COM1:
-        line = (int *)( UART1_BASE + UART_LCRH_OFFSET );
+        flags = (int *)( UART1_BASE + UART_LCRH_OFFSET );
+        break;
+    case COM2:
+        flags = (int *)( UART2_BASE + UART_LCRH_OFFSET );
+        break;
+    default:
+        return NULL;
+        break;
+    }
+    return flags;
+}
+
+int setfifo( int channel, int state ) {
+    int *line, buf;
+    line = getUARTHighControl(channel);
+    buf = *line;
+    buf = state ? buf | FEN_MASK : buf & ~FEN_MASK;
+    *line = buf;
+    return 0;
+}
+
+int setSpeed( int channel, int speed ) {
+    int *high, *low;
+    switch( channel ) {
+    case COM1:
+        high = (int *)( UART1_BASE + UART_LCRM_OFFSET );
+        low = (int *)( UART1_BASE + UART_LCRL_OFFSET );
             break;
     case COM2:
-            line = (int *)( UART2_BASE + UART_LCRH_OFFSET );
+        high = (int *)( UART2_BASE + UART_LCRM_OFFSET );
+        low = (int *)( UART2_BASE + UART_LCRL_OFFSET );
             break;
     default:
             return -1;
             break;
     }
-    buf = *line;
-    buf = state ? buf | FEN_MASK : buf & ~FEN_MASK;
-    *line = buf;
-    return 0;
+    switch( speed ) {
+    case 115200:
+        *high = 0x0;
+        *low = 0x3;  // 0000_0011
+        return 0;
+    case 2400:
+        *high = 0x0;
+        *low = 0xbf; // 1001_0000 = 144; 1010_1111 = 191.
+        return 0;
+    default:
+        return -1;
+    }
 }
 
 int* getUARTFlags(int channel) {
@@ -111,6 +147,7 @@ int processInputBuffer( globalsStruct* globals, int channel ) {
             clearCommandPrompt(globals);
             printPreviousCommand(globals);
             globals->inputBuffer->readIndex = globals->inputBuffer->writeIndex;
+            // runTrain(globals, 70, 12);
         }
     }
     return 0;

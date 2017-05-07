@@ -18,6 +18,8 @@ typedef char *va_list;
 
 int setfifo( int channel, int state );
 
+int setSpeed( int channel, int speed );
+
 int putc( globalsStruct* globals, int channel, char c );
 
 int getc( globalsStruct* globals, int channel );
@@ -32,6 +34,7 @@ void putw( globalsStruct* globals, int channel, int n, char fc, char *bf );
 
 void bfprintf( globalsStruct* globals, int channel, char *fmt, ... );
 
+int* getUARTHighControl(int channel);
 int* getUARTFlags(int channel);
 int* getUARTData(int channel);
 int processInputBuffer(globalsStruct* globals, int channel);

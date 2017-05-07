@@ -22,4 +22,6 @@ void printPreviousCommand(globalsStruct* globals);
 void eraseCurrentCommand(globalsStruct* globals);
 void clearCommandPrompt(globalsStruct* globals);
 
+void printDebug(globalsStruct* globals, int row, int column, char c);
+
 #endif

@@ -2,6 +2,7 @@
 #include <ts7200.h>
 #include <ui.h>
 #include <timer.h>
+#include <trackControl.h>
 
 void startTimer() {
     V int *load = (int *) (TIMER3_BASE + LDR_OFFSET);
@@ -27,6 +28,7 @@ void processTime(V globalsStruct* globals) {
         timer->msFromEpoch++;
         timer->previousTicksCounter = timer->ticksCounter;
         timer->timePrinted = 0;
+        processTrackSendBuffer(globals);
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
         printTimer(globals);
