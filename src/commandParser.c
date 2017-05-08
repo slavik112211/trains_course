@@ -5,16 +5,16 @@
 #define COMMAND_PARTS 3
 
 int parseCommand(globalsStruct* globals) {
-    int resultStatus = 0;
+    int resultStatus = 0, trainId = 0, trainSpeed = 0;
     char* delim = " ";
     char* trainForwardCommand = "tr";
-    // char* trainReverse = "rv";
+    char* trainReverseCommand = "rv";
     // char* switchControl = "sw";
     char* quitCommand = "q";
+    
     char command[COMMAND_PARTS][10]; //three command parts, 10 char max length
 
-    V int i = 0, trainId = 0, trainSpeed = 0;
-
+    V int i = 0;
     for (i; i<COMMAND_PARTS; i++) {
         getStringPart(globals->inputCommand, i, delim, command[i]);
     }
@@ -23,6 +23,9 @@ int parseCommand(globalsStruct* globals) {
         trainId = atoi(command[1]);
         trainSpeed = atoi(command[2]);
         runTrain(globals, trainId, trainSpeed);
+    } else if (strCompare(command[0], trainReverseCommand) == 0) {
+        trainId = atoi(command[1]);
+        reverseTrain(globals, trainId);
     } else if (strCompare(command[0], quitCommand) == 0) {
         resultStatus = -1;
     }

@@ -1,12 +1,6 @@
 #include <ringBuffer.h>
 #include <main.h>
 
-ringBuffer ringBuffer_new(int size) {
-    char bufferContainer[size];
-    ringBuffer buffer = {bufferContainer, size, 0, 0};
-    return buffer;
-}
-
 int ringBuffer_hasElements(ringBuffer *buf) {
     return (buf->writeIndex != buf->readIndex) ? 1 : 0;
 }
@@ -22,8 +16,34 @@ char ringBuffer_pop(ringBuffer *buf) {
     return c;
 }
 
+char ringBuffer_peek(ringBuffer *buf) {
+    return buf->buffer[buf->readIndex];
+}
+
 void ringBuffer_advanceIndex(int *index, int *size) {
     *index = (*index == *size - 1) ? 0 : (*index) + 1;
+}
+
+// Implementation of the ringBuffer for storing delayedElements.
+// TODO: make a generic implementation to accept ANY elements.
+
+int delayedRingBuffer_hasElements(delayedRingBuffer *buf) {
+    return (buf->writeIndex != buf->readIndex) ? 1 : 0;
+}
+
+void delayedRingBuffer_push(delayedRingBuffer *buf, delayedCommand c) {
+    buf->buffer[buf->writeIndex] = c;
+    ringBuffer_advanceIndex(&(buf->writeIndex), &(buf->size));
+}
+
+delayedCommand delayedRingBuffer_pop(delayedRingBuffer *buf) {
+    delayedCommand c = buf->buffer[buf->readIndex];
+    ringBuffer_advanceIndex(&(buf->readIndex), &(buf->size));
+    return c;
+}
+
+delayedCommand delayedRingBuffer_peek(delayedRingBuffer *buf) {
+    return buf->buffer[buf->readIndex];
 }
 
 int test_push();

@@ -26,6 +26,7 @@ typedef struct {
     ringBuffer* outputBuffer;
     ringBuffer* inputBuffer;
     ringBuffer* trackSendBuffer;
+    delayedRingBuffer* trackSendDelayedBuffer;
     char* inputCommand;
 } globalsStruct;
 

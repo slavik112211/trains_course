@@ -35,6 +35,7 @@ void initUART(int channel) {
     *line = buf;
 }
 
+// 0=stop, 1=slowest, 14=fastest, 15=reverse direction
 void runTrain(globalsStruct* globals, int train, int speed) {
     if(speed < 0 || speed > 14) speed = 5;
     if(train < 0 || train > 100) train = 58;
@@ -43,9 +44,34 @@ void runTrain(globalsStruct* globals, int train, int speed) {
 }
 
 void stopTrain(globalsStruct* globals, int train) {
-    if(train < 0 || train > 100) train = 58;
-    ringBuffer_push(globals->trackSendBuffer, 0);
-    ringBuffer_push(globals->trackSendBuffer, train);
+    runTrain(globals, train, 0);
+}
+
+void reverseTrain(globalsStruct* globals, int trainId) {
+    stopTrain(globals, trainId);
+
+    int timestamp = globals->timer->msFromEpoch + 2000; //2 seconds from now
+    delayedCommand reverseCommand1, reverseCommand2, runCommand1, runCommand2;
+
+    // speed=15 sets the train in reverse direction. This setting is just a flag,
+    // an actual speed has to be communicated as a separate command.
+    reverseCommand1.value = 15;
+    reverseCommand1.timestamp = timestamp;
+
+    reverseCommand2.value = trainId;
+    reverseCommand2.timestamp = timestamp;
+
+    timestamp += 150;
+    runCommand1.value = 10; //speed=10 (range: 0 to 14)
+    runCommand1.timestamp = timestamp;
+    
+    runCommand2.value = trainId;
+    runCommand2.timestamp = timestamp;
+
+    delayedRingBuffer_push(globals->trackSendDelayedBuffer, reverseCommand1);
+    delayedRingBuffer_push(globals->trackSendDelayedBuffer, reverseCommand2);
+    delayedRingBuffer_push(globals->trackSendDelayedBuffer, runCommand1);
+    delayedRingBuffer_push(globals->trackSendDelayedBuffer, runCommand2);
 }
 
 void processTrackSendBuffer(globalsStruct* globals) {
@@ -58,5 +84,17 @@ void processTrackSendBuffer(globalsStruct* globals) {
         // printDebug(globals, 5, 5, c);
         // for(i=0; i<5000; i++) {}
         // while( ( *flags & TXFF_MASK ) ) ;
+    }
+}
+
+void processTrackSendDelayedBuffer(globalsStruct* globals) {
+    delayedRingBuffer *delayedBuffer = globals->trackSendDelayedBuffer;
+
+    if(delayedRingBuffer_hasElements(delayedBuffer)) {
+        delayedCommand nextCommand = delayedRingBuffer_peek(delayedBuffer);
+        if(globals->timer->msFromEpoch > nextCommand.timestamp) {
+            nextCommand = delayedRingBuffer_pop(delayedBuffer);
+            ringBuffer_push(globals->trackSendBuffer, nextCommand.value);
+        }
     }
 }

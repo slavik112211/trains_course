@@ -9,17 +9,21 @@ int main(int argc, char* argv[]) {
     globalsStruct globals;
     timerStruct timer;
     V char outputBufferContainer[20000];
-    ringBuffer outputBuffer = {(char*) &outputBufferContainer, 20000, 0, 0};
     V char inputBufferContainer[1024];
-    ringBuffer inputBuffer = {(char*) &inputBufferContainer, 1024, 0, 0};
     V char trackSendContainer[1024];
-    ringBuffer trackSendBuffer = {(char*) &trackSendContainer, 1024, 0, 0};
+    V delayedCommand trackSendDelayedContainer[100];
     char inputCommand[100];
+
+    ringBuffer outputBuffer = {(char*) &outputBufferContainer, 20000, 0, 0};
+    ringBuffer inputBuffer = {(char*) &inputBufferContainer, 1024, 0, 0};
+    ringBuffer trackSendBuffer = {(char*) &trackSendContainer, 1024, 0, 0};
+    delayedRingBuffer trackSendDelayedBuffer = {(delayedCommand*) &trackSendDelayedContainer, 100, 0, 0};
 
     globals.timer = &timer;
     globals.outputBuffer = &outputBuffer;
     globals.inputBuffer = &inputBuffer;
     globals.trackSendBuffer = &trackSendBuffer;
+    globals.trackSendDelayedBuffer = &trackSendDelayedBuffer;
     globals.inputCommand = &inputCommand[0];
 
     drawFrame(&globals);
@@ -37,4 +41,3 @@ int main(int argc, char* argv[]) {
     }
     return 0;
 }
-

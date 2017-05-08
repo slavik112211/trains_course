@@ -37,6 +37,7 @@ void processTime(globalsStruct* globals) {
         timer->previousTicksCounter = timer->ticksCounter;
         timer->timePrinted = 0;
         processTrackSendBuffer(globals);
+        processTrackSendDelayedBuffer(globals);
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
         printTimer(globals);
