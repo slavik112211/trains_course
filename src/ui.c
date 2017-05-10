@@ -2,6 +2,7 @@
 #include <bufferIO.h>
 #include <stringFormat.h>
 #include <ui.h>
+#include <trackControl.h>
 
 // http://ascii-table.com/ansi-escape-sequences.php
 
@@ -108,4 +109,20 @@ void clearCommandPrompt(globalsStruct* globals) {
 void printDebug(globalsStruct* globals, int row, int column, char c) {
     moveCursorToPosition(globals, row, column);
     putr(globals, COM2, c);
+}
+
+void printSwitches(globalsStruct* globals) {
+    V int i = 0;
+    for(i; i<SWITCHES_ON_TRACK; i++) {
+        printSwitch(globals, i);
+    }
+}
+
+void printSwitch(globalsStruct* globals, int switchIndex) {
+    V int row = 5, column = 5;
+    moveCursorToPosition(globals, row + switchIndex, column);
+    bfprintf(globals, COM2, "%u", switchIndexToId(switchIndex));
+
+    moveCursorToPosition(globals, row + switchIndex, column + 6);
+    putc(globals, COM2, switchCommandIdToCommandName(globals->switches[switchIndex]));
 }

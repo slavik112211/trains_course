@@ -5,11 +5,11 @@
 #define COMMAND_PARTS 3
 
 int parseCommand(globalsStruct* globals) {
-    int resultStatus = 0, trainId = 0, trainSpeed = 0;
+    int resultStatus = 0, trainId = 0, trainSpeed = 0, switchId = 0;
     char* delim = " ";
     char* trainForwardCommand = "tr";
     char* trainReverseCommand = "rv";
-    // char* switchControl = "sw";
+    char* switchControlCommand = "sw";
     char* quitCommand = "q";
     
     char command[COMMAND_PARTS][10]; //three command parts, 10 char max length
@@ -26,6 +26,9 @@ int parseCommand(globalsStruct* globals) {
     } else if (strCompare(command[0], trainReverseCommand) == 0) {
         trainId = atoi(command[1]);
         reverseTrain(globals, trainId);
+    } else if (strCompare(command[0], switchControlCommand) == 0) {
+        switchId = atoi(command[1]);
+        setSwitchPosition(globals, switchId, switchCommandNameToCommandId(command[2]), 1);
     } else if (strCompare(command[0], quitCommand) == 0) {
         resultStatus = -1;
     }

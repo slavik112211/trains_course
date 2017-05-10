@@ -20,6 +20,8 @@ void printActiveCommand(globalsStruct* globals);
 void printPreviousCommand(globalsStruct* globals);
 void eraseCurrentCommand(globalsStruct* globals);
 void clearCommandPrompt(globalsStruct* globals);
+void printSwitches(globalsStruct* globals);
+void printSwitch(globalsStruct* globals, int switchIndex);
 
 void printDebug(globalsStruct* globals, int row, int column, char c);
 

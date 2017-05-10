@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
     globals.trackSendBuffer = &trackSendBuffer;
     globals.trackSendDelayedBuffer = &trackSendDelayedBuffer;
     globals.inputCommand = &inputCommand[0];
+    globals.counterCOM1 = 0;
 
     drawFrame(&globals);
     startTimer(&globals);

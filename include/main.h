@@ -14,6 +14,8 @@
 #define ON	1
 #define	OFF	0
 
+#define SWITCHES_ON_TRACK 22 // catch 22! ;)
+
 typedef struct {
     unsigned int ticksCounter;
     unsigned int previousTicksCounter;
@@ -28,6 +30,8 @@ typedef struct {
     ringBuffer* trackSendBuffer;
     delayedRingBuffer* trackSendDelayedBuffer;
     char* inputCommand;
+    int switches[SWITCHES_ON_TRACK];
+    int counterCOM1;
 } globalsStruct;
 
 #endif
