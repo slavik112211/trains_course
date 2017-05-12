@@ -7,6 +7,10 @@
 #define SWITCH_CURVED 34
 #define SOLENOID_OFF 32
 
+// track commands pushed to a trackSendBufferStruct types:
+#define TRACK_CONTROL_COMMAND 0
+#define SENSORS_DUMP_COMMAND 1
+
 void initTrack(globalsStruct* globals);
 void startTrack(globalsStruct* globals);
 void stopTrack(globalsStruct* globals);
@@ -19,6 +23,7 @@ void setSwitchPosition(globalsStruct* globals, int switchId, int position, int s
 void deactivateSolenoids(globalsStruct* globals);
 void processTrackSendBuffer(globalsStruct* globals);
 void processTrackSendDelayedBuffer(globalsStruct* globals);
+void processTrackReceiveBuffer(globalsStruct* globals);
 
 int switchIndexToId(V int switchIndex);
 int switchIdToIndex(V int switchId);

@@ -6,6 +6,7 @@
 #include <ts7200.h>
 #include <commandParser.h>
 #include <stringFormat.h>
+#include <sensors.h>
 
 /*
  * https://www.student.cs.uwaterloo.ca/~cs452/manual/trains.html
@@ -20,11 +21,17 @@ void initTrack(globalsStruct* globals) {
 }
 
 void startTrack(globalsStruct* globals) {
-    ringBuffer_push(globals->trackSendBuffer, 0x60);
+    trackCommand command;
+    command.type = TRACK_CONTROL_COMMAND;
+    command.data = 0x60;
+    trackSendBuffer_push(globals->trackSendBuffer, command);
 }
 
 void stopTrack(globalsStruct* globals) {
-    ringBuffer_push(globals->trackSendBuffer, 0x61);
+    trackCommand command;
+    command.type = TRACK_CONTROL_COMMAND;
+    command.data = 0x61;
+    trackSendBuffer_push(globals->trackSendBuffer, command);
 }
 
 void initUART(int channel) {
@@ -65,8 +72,11 @@ void initSwitches(globalsStruct* globals) {
 void runTrain(globalsStruct* globals, int train, int speed) {
     if(speed < 0 || speed > 14) speed = 5;
     if(train < 0 || train > 100) train = 58;
-    ringBuffer_push(globals->trackSendBuffer, speed);
-    ringBuffer_push(globals->trackSendBuffer, train);
+
+    trackCommand commandSpeed = {TRACK_CONTROL_COMMAND, speed};
+    trackCommand commandTrainId = {TRACK_CONTROL_COMMAND, train};
+    trackSendBuffer_push(globals->trackSendBuffer, commandSpeed);
+    trackSendBuffer_push(globals->trackSendBuffer, commandTrainId);
 }
 
 void stopTrain(globalsStruct* globals, int train) {
@@ -109,8 +119,10 @@ void setSwitchPosition(globalsStruct* globals, int switchId, int position, int s
     globals->switches[switchIdToIndex(switchId)] = position;
     printSwitch(globals, switchIdToIndex(switchId));
 
-    ringBuffer_push(globals->trackSendBuffer, position);
-    ringBuffer_push(globals->trackSendBuffer, switchId);
+    trackCommand commandPosition = {TRACK_CONTROL_COMMAND, position};
+    trackCommand commandSwitchId = {TRACK_CONTROL_COMMAND, switchId};
+    trackSendBuffer_push(globals->trackSendBuffer, commandPosition);
+    trackSendBuffer_push(globals->trackSendBuffer, commandSwitchId);
 
     if (setSolenoidsOff != 0) deactivateSolenoids(globals);
 }
@@ -132,15 +144,29 @@ void deactivateSolenoids(globalsStruct* globals){
 }
 
 void processTrackSendBuffer(globalsStruct* globals) {
-    int *flags, *data, value;
+    int *flags, *data, clearToSend;
+    trackCommand command;
     flags = getUARTFlags(COM1);
     data = getUARTData(COM1);
-    if (ringBuffer_hasElements(globals->trackSendBuffer) == 1 &&
-            (*flags & TXFE_MASK) && (*flags & CTS_MASK)) {
-        value = ringBuffer_pop(globals->trackSendBuffer);
-        *data = value;
-        // printDebug(globals, globals->counterCOM1 + 4, 30, value);
-        // globals->counterCOM1++;
+
+    if (trackSendBuffer_hasElements(globals->trackSendBuffer) == 1
+            && (*flags & TXFE_MASK) && (*flags & CTS_MASK)) {
+
+        command = trackSendBuffer_peek(globals->trackSendBuffer);
+        if(command.type == TRACK_CONTROL_COMMAND) {
+            clearToSend = 1;
+        } else if (command.type == SENSORS_DUMP_COMMAND && !globals->sensorsParams->requestSent) {
+            globals->sensorsParams->requestSent = 1;
+            globals->sensorsParams->bytesReceived = 0;
+            clearToSend = 1;
+        }
+        if(clearToSend) {
+            command = trackSendBuffer_pop(globals->trackSendBuffer);
+            *data = command.data;
+            clearToSend = 0;
+            // printDebug(globals, globals->counterCOM1 + 4, 30, command.data);
+            // globals->counterCOM1++;
+        }
     }
 }
 
@@ -151,7 +177,33 @@ void processTrackSendDelayedBuffer(globalsStruct* globals) {
         delayedCommand nextCommand = delayedRingBuffer_peek(delayedBuffer);
         if(globals->timer->msFromEpoch > nextCommand.timestamp) {
             nextCommand = delayedRingBuffer_pop(delayedBuffer);
-            ringBuffer_push(globals->trackSendBuffer, nextCommand.value);
+
+            trackCommand command = {TRACK_CONTROL_COMMAND, nextCommand.value};
+            trackSendBuffer_push(globals->trackSendBuffer, command);
+        }
+    }
+}
+
+void processTrackReceiveBuffer(globalsStruct* globals) {
+    int *flags, *data, flagsBuffer;
+    char c;
+    flags = getUARTFlags(COM1);
+    data = getUARTData(COM1);
+
+    if(*flags & RXFF_MASK) {
+        c = *data;
+        flagsBuffer = *flags;
+        flagsBuffer = flagsBuffer & ~RXFF_MASK; // set 'Receive register full' to OFF
+        flagsBuffer = flagsBuffer | RXFE_MASK;  // set 'Receive register empty' to ON
+        *flags = flagsBuffer;
+
+        globals->sensorsParams->bytesReceived++;
+        printSensorData(globals, &c);
+
+        // each sensor returns 2 bytes
+        if(globals->sensorsParams->bytesReceived == TOTAL_SENSORS * 2) {
+            globals->sensorsParams->requestSent = 0;
+            globals->sensorsParams->bytesReceived = 0;
         }
     }
 }

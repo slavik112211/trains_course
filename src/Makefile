@@ -24,8 +24,8 @@ main.s: main.c
 main.o: main.s
 	$(AS) $(ASFLAGS) -o main.o main.s
 
-main.elf: main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o
-	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o -lgcc
+main.elf: main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o sensors.o
+	$(LD) $(LDFLAGS) -o $@ main.o timer.o ringBuffer.o stringFormat.o bufferIO.o ui.o trackControl.o commandParser.o sensors.o -lgcc
 
 timer.s: timer.c
 	$(XCC) -S $(CFLAGS) timer.c
@@ -68,6 +68,12 @@ commandParser.s: commandParser.c
 
 commandParser.o: commandParser.s
 	$(AS) $(ASFLAGS) -o commandParser.o commandParser.s
+
+sensors.s: sensors.c
+	$(XCC) -S $(CFLAGS) sensors.c
+
+sensors.o: sensors.s
+	$(AS) $(ASFLAGS) -o sensors.o sensors.s
 
 clean:
 	-rm -f main.elf *.s *.o main.map

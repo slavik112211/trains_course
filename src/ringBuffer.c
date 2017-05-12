@@ -46,6 +46,28 @@ delayedCommand delayedRingBuffer_peek(delayedRingBuffer *buf) {
     return buf->buffer[buf->readIndex];
 }
 
+// Implementation of the ringBuffer for storing railroad commands.
+// TODO: make a generic implementation to accept ANY elements.
+
+int trackSendBuffer_hasElements(trackSendBufferStruct *buf) {
+    return (buf->writeIndex != buf->readIndex) ? 1 : 0;
+}
+
+void trackSendBuffer_push(trackSendBufferStruct *buf, trackCommand c) {
+    buf->buffer[buf->writeIndex] = c;
+    ringBuffer_advanceIndex(&(buf->writeIndex), &(buf->size));
+}
+
+trackCommand trackSendBuffer_pop(trackSendBufferStruct *buf) {
+    trackCommand c = buf->buffer[buf->readIndex];
+    ringBuffer_advanceIndex(&(buf->readIndex), &(buf->size));
+    return c;
+}
+
+trackCommand trackSendBuffer_peek(trackSendBufferStruct *buf) {
+    return buf->buffer[buf->readIndex];
+}
+
 int test_push();
 int test_pop();
 int test_hasElements();

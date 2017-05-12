@@ -4,19 +4,22 @@
 #include <ui.h>
 #include <ringBuffer.h>
 #include <trackControl.h>
+#include <sensors.h>
 
 int main(int argc, char* argv[]) {
     globalsStruct globals;
     timerStruct timer;
+    sensorsParamsStruct sensorsParams;
     V char outputBufferContainer[20000];
     V char inputBufferContainer[1024];
-    V char trackSendContainer[1024];
+    V trackCommand trackSendContainer[1024];
+
     V delayedCommand trackSendDelayedContainer[100];
     char inputCommand[100];
 
     ringBuffer outputBuffer = {(char*) &outputBufferContainer, 20000, 0, 0};
     ringBuffer inputBuffer = {(char*) &inputBufferContainer, 1024, 0, 0};
-    ringBuffer trackSendBuffer = {(char*) &trackSendContainer, 1024, 0, 0};
+    trackSendBufferStruct trackSendBuffer = {(trackCommand*) &trackSendContainer, 1024, 0, 0};
     delayedRingBuffer trackSendDelayedBuffer = {(delayedCommand*) &trackSendDelayedContainer, 100, 0, 0};
 
     globals.timer = &timer;
@@ -25,6 +28,7 @@ int main(int argc, char* argv[]) {
     globals.trackSendBuffer = &trackSendBuffer;
     globals.trackSendDelayedBuffer = &trackSendDelayedBuffer;
     globals.inputCommand = &inputCommand[0];
+    globals.sensorsParams = &sensorsParams;
     globals.counterCOM1 = 0;
 
     drawFrame(&globals);
@@ -32,6 +36,7 @@ int main(int argc, char* argv[]) {
     printPrompt(&globals);
     setFIFO(COM2, OFF);
     initTrack(&globals);
+    initSensors(&globals);
 
     V int resultStatus;
     FOREVER {

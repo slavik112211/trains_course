@@ -3,6 +3,7 @@
 #include <ui.h>
 #include <timer.h>
 #include <trackControl.h>
+#include <sensors.h>
 
 void initTimer(timerStruct *timer) {
     timer->ticksCounter = 0;
@@ -38,10 +39,14 @@ void processTime(globalsStruct* globals) {
         timer->timePrinted = 0;
         processTrackSendBuffer(globals);
         processTrackSendDelayedBuffer(globals);
+        processTrackReceiveBuffer(globals);
     }
     if (timer->msFromEpoch % 100 == 0 && !timer->timePrinted) {
         printTimer(globals);
         printActiveCommand(globals);
+    }
+    if (timer->msFromEpoch % 300 == 0) {
+        sendSensorsDumpRequest(globals);
     }
 }
 
